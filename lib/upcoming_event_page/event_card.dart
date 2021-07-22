@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -10,8 +11,17 @@ class EventCard extends StatelessWidget{
   final String wann;
   final String beschreibung;
   final Widget newRoute;
+  final VoidCallback callback;
 
-  EventCard({this.newRoute, this.was, this.wer, this.wo, this.wann, this.beschreibung});
+  EventCard({
+    this.newRoute,
+    this.was,
+    this.wer,
+    this.wo,
+    this.wann,
+    this.beschreibung,
+    this.callback
+  });
 
   @override
   Widget build(BuildContext context){
@@ -45,7 +55,7 @@ class EventCard extends StatelessWidget{
               secondaryActions: [
                 IconSlideAction(
                   color: Colors.redAccent,
-                  onTap: () {},
+                  onTap: this.callback,
                   icon: Icons.delete,
                   caption: "Delete"
                 )
@@ -121,6 +131,6 @@ class EventCard extends StatelessWidget{
         ),
       )
     );
-
   }
+
 }

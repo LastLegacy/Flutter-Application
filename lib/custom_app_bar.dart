@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'side_drawer/side_drawer.dart';
+
 class CustomAppBar extends StatelessWidget with PreferredSizeWidget{
   final String title;
-  final Widget myIcon;
 
-  CustomAppBar(this.title, [this.myIcon]);
+  CustomAppBar(this.title);
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
@@ -22,7 +23,6 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget{
         ),
       backgroundColor: Colors.transparent,
       elevation: 0,
-      leading: myIcon,
       centerTitle: true,
     );
   }

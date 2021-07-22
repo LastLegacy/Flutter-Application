@@ -1,92 +1,71 @@
-import 'CustomAppBar.dart';
-import 'PastEvents.dart';
-import 'UpcomingEvents.dart';
+import 'authentication_process/authentication_services/authenticaton_service.dart';
+import 'authentication_process/pages/sign_in_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'home_page.dart';
+import 'package:provider/provider.dart';
+
 
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+
+  final Future<FirebaseApp> firebaseEventapp = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        scaffoldBackgroundColor: Color.fromRGBO(6,47,103,175),
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return MultiProvider(
+      providers: [
+        Provider(
+          create: (_) => AuthenticationService(FirebaseAuth.instance)
+        ),
+        StreamProvider(
+          create: (context) => context.read<AuthenticationService>().authStateChanges,
+        ),
+      ],
+      child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            scaffoldBackgroundColor: Color.fromRGBO(6,47,103,175),
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          home: FutureBuilder(
+            future: firebaseEventapp,
+            builder: (context, snapshot){
+              if (snapshot.hasData){
+                return AuthenticationWrapper();
+              }
+              else if (snapshot.hasError){
+                print(snapshot.error.toString());
+                return Text("There is an Error! ${snapshot.error.toString()}");
+              }
+              else{
+                return Center(
+                    child: CircularProgressIndicator()
+                );
+              }
+            },
+
+          )
       ),
-      home: MyHomePage(title: 'Event Organizer'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class AuthenticationWrapper extends StatelessWidget{
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+  Widget build(BuildContext context){
+    final firebaseUser = context.watch<User>();
 
-class _MyHomePageState extends State<MyHomePage> {
-
-  int selectedIndex = 0;
-
-  final List<Widget> pages = [
-    UpcomingEvents(),
-    PastEvents(),
-    Container()
-  ];
-
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: CustomAppBar(widget.title, Icon(Icons.menu)),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.redAccent,
-        unselectedItemColor: Colors.white.withOpacity(.5),
-        selectedItemColor: Colors.white,
-        currentIndex: selectedIndex,
-        onTap: (index) => setState(() {
-          selectedIndex = index;
-        }),
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: "Upcoming Events"
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: "Past Events"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
-              label: "Calender"
-          ),
-        ],
-      ),
-      body: this.pages[selectedIndex]
-
-    );
+    if (firebaseUser != null){
+      return MyHomePage();
+    }
+    return SignInPage();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'CustomAppBar.dart';
-import 'EventCard.dart';
+import '../custom_app_bar.dart';
+import 'event_card.dart';
 
 class ExpandedEventCard extends StatelessWidget{
 

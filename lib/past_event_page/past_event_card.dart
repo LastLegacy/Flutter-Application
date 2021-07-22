@@ -1,17 +1,19 @@
+import 'dart:io';
+
+import 'package:eventapp/entities/PastEvent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'MemoriesGallery.dart';
 
 class PastEventCard extends StatelessWidget{
 
   final Widget newRoute;
   final String title;
+  final PastEvent event;
 
-  PastEventCard({this.newRoute, this.title});
+  PastEventCard({this.newRoute, this.title, this.event});
 
-
-  List<String> getFirstThree(List<String> liste){
-    Iterable<String> threeList = liste.getRange(0, 3);
+  List<File> getFirstThree(List<File> liste){
+    Iterable<File> threeList = liste.getRange(0, 3);
     threeList.join(', ');
     return threeList.toList();
   }
@@ -52,6 +54,7 @@ class PastEventCard extends StatelessWidget{
                     this.title,
                     style: TextStyle(
                       color: Colors.white,
+                      fontWeight: FontWeight.bold,
                       fontSize: 22,
                       fontFamily: "Raleway"
                     ),
@@ -68,19 +71,36 @@ class PastEventCard extends StatelessWidget{
                     mainAxisSpacing: 20,
                     crossAxisSpacing: 10,
                     childAspectRatio: 4/3,
-                    children: getFirstThree(MemoriesGallery.staticimages).map((e) => Card(
-                      child: Container(
-                        decoration: BoxDecoration(
+                    children:
+                      this.event.pictures.length <= 3
+                      ?
+                        this.event.pictures.map((e) => Card(
+                        child: Container(
+                          decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage(e),
+                              image: FileImage(e),
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(10)
+                          ),
                         ),
-                      ),
-                      elevation: 6,
-                      color: Colors.transparent,
-                    )).toList()
+                        elevation: 6,
+                        color: Colors.transparent,
+                      )).toList()
+                      :
+                        getFirstThree(this.event.pictures).map((e) => Card(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: FileImage(e),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(10)
+                            ),
+                          ),
+                          elevation: 6,
+                          color: Colors.transparent,
+                        )).toList()
                   ),
                 ],
               )

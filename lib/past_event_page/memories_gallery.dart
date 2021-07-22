@@ -1,12 +1,17 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:eventapp/entities/PastEvent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'CustomAppBar.dart';
+import '../custom_app_bar.dart';
 import 'package:image_picker/image_picker.dart';
 
 
 class MemoriesGallery extends StatefulWidget{
+  MemoriesGallery({this.tag, this.event});
+
+  final String tag;
+  final PastEvent event;
 
   static List<String> staticimages = [
     "assets/kochen.JPG",
@@ -14,27 +19,29 @@ class MemoriesGallery extends StatefulWidget{
     "assets/cologne.jpg",
   ];
 
+  static List<File> dynamicImages;
+
   @override
   _MemoriesGalleryState createState() => _MemoriesGalleryState();
 }
 
 class _MemoriesGalleryState extends State<MemoriesGallery> {
 
+
   final Shader linearGradient = LinearGradient(
     colors: <Color>[Colors.indigoAccent, Colors.redAccent],
   ).createShader(new Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
 
 
-  List<File> _dynamicImages = [];
-
-  File imageFile;
+    File imageFile;
   final ImagePicker picker = ImagePicker();
 
   Future openGallery(BuildContext context) async {   // async-task --> undefined time
     final pickedPicture = await picker.getImage(source: ImageSource.gallery);
     this.setState(() {
       imageFile = File(pickedPicture.path);
-      _dynamicImages.add(imageFile);
+      //MemoriesGallery.dynamicImages.add(imageFile);
+      widget.event.pictures.add(imageFile);
     });
     Navigator.pop(context);
   }
@@ -43,7 +50,7 @@ class _MemoriesGalleryState extends State<MemoriesGallery> {
     final pickedPicture = await picker.getImage(source: ImageSource.camera);
     this.setState(() {
       imageFile = File(pickedPicture.path);
-      _dynamicImages.add(imageFile);
+      MemoriesGallery.dynamicImages.add(imageFile);
     });
     Navigator.pop(context);
   }
@@ -139,7 +146,7 @@ class _MemoriesGalleryState extends State<MemoriesGallery> {
       body: Column(
         children: <Widget>[
           Hero(
-          tag: "album",
+          tag: widget.tag,
             child: Container(
               //alignment: Alignment.center,
               margin: EdgeInsets.fromLTRB(20,15,20,20),
@@ -176,7 +183,7 @@ class _MemoriesGalleryState extends State<MemoriesGallery> {
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
                 childAspectRatio: 4/3,
-                children: _dynamicImages.map((image) => Card(
+                children: widget.event.pictures.map((image) => Card(
                   child: Container(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
@@ -237,19 +244,3 @@ class _MemoriesGalleryState extends State<MemoriesGallery> {
     );
   }
 }
-
-/*
-* !!!MemoriesGallery.staticimages.map((e) => Card(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(e),
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                  ),
-                  elevation: 6,
-                  color: Colors.transparent,
-  !!              )).toList()
-* */
